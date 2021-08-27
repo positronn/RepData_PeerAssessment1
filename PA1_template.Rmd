@@ -1,13 +1,24 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+author: "Marco de los Santos"
 output: 
   html_document:
     keep_md: true
 ---
 
+## Load libraries
+```{r}
+library("data.table")
+library(ggplot2)
+```
 
 ## Loading and preprocessing the data
+Unzip data to obtain a csv file.
 
+```{r}
+unzip("activity.zip",exdir = "data")
+activityDT <- data.table::fread(input = "data/activity.csv")
+```
 
 
 ## What is mean total number of steps taken per day?
