@@ -43,7 +43,30 @@ head(steps, 10)
 ##  9: 2012-10-09 12811
 ## 10: 2012-10-10  9900
 ```
+Histogram
 
+```r
+ggplot(steps, aes(x = steps)) +
+    geom_histogram(fill = "steelblue", binwidth = 1000, alpha=0.6, color='black') +
+    labs(title = "Daily Steps", x = "Steps", y = "Frequency")
+```
+
+```
+## Warning: Removed 8 rows containing non-finite values (stat_bin).
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+mean and median of the total number of steps taken per day
+
+```r
+steps[, .(mean = mean(steps, na.rm = TRUE), median = median(steps, na.rm = TRUE))]
+```
+
+```
+##        mean median
+## 1: 10766.19  10765
+```
 
 ## What is the average daily activity pattern?
 
