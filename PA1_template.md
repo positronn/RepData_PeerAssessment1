@@ -150,7 +150,7 @@ steps_cln |>
     ggplot(aes(x = steps)) + geom_histogram(fill = "steelblue", binwidth = 1000, alpha=0.6, color='black') + labs(title = "Daily Steps", x = "Steps", y = "Frequency")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+<img src="PA1_template_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
 
 
 ```r
@@ -186,3 +186,48 @@ summary(steps_cln)
 
 ## Are there differences in activity patterns between weekdays and weekends?
 Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+
+
+```r
+# Just recreating activityDT from scratch then making the new factor variable. (No need to, just want to be clear on what the entire process is.) 
+activity <- data.table::fread(input = "data/activity.csv")
+activity[, date := as.POSIXct(date, format = "%Y-%m-%d")]
+activity[, day_of_week:= weekdays(x = date)]
+activity[grepl(pattern = "Monday|Tuesday|Wednesday|Thursday|Friday", x = day_of_week), "weekday or weekend"] <- "weekday"
+activity[grepl(pattern = "Saturday|Sunday", x = day_of_week), "weekday_or_weekend"] <- "weekend"
+activity[, weekday_or_weekend := as.factor(weekday_or_weekend)]
+head(activity, 10)
+```
+
+```
+##     steps       date interval day_of_week weekday or weekend weekday_or_weekend
+##  1:    NA 2012-10-01        0      Monday            weekday               <NA>
+##  2:    NA 2012-10-01        5      Monday            weekday               <NA>
+##  3:    NA 2012-10-01       10      Monday            weekday               <NA>
+##  4:    NA 2012-10-01       15      Monday            weekday               <NA>
+##  5:    NA 2012-10-01       20      Monday            weekday               <NA>
+##  6:    NA 2012-10-01       25      Monday            weekday               <NA>
+##  7:    NA 2012-10-01       30      Monday            weekday               <NA>
+##  8:    NA 2012-10-01       35      Monday            weekday               <NA>
+##  9:    NA 2012-10-01       40      Monday            weekday               <NA>
+## 10:    NA 2012-10-01       45      Monday            weekday               <NA>
+```
+
+
+Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+
+```r
+activity[is.na(steps), "steps"] <- activity[, c(lapply(.SD, median, na.rm = TRUE)), .SDcols = c("steps")]
+
+
+interval <- activity[, c(lapply(.SD, mean, na.rm = TRUE)), .SDcols = c("steps"), by = .(interval, weekday_or_weekend)] 
+
+interval |>
+    ggplot(aes(x = interval , y = steps, color=weekday_or_weekend)) +
+    geom_line() +
+    labs(title = "Avgerage daily steps by weektype", x = "Interval", y = "Number of Steps") +
+    facet_wrap(~weekday_or_weekend , ncol = 1, nrow=2)
+```
+
+<img src="PA1_template_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
